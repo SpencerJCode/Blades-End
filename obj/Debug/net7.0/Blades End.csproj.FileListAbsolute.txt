@@ -1,0 +1,15 @@
+C:\Users\Spencer Laptop\Desktop\Software Development\Blades End\bin\Debug\net7.0\Blades End.exe
+C:\Users\Spencer Laptop\Desktop\Software Development\Blades End\bin\Debug\net7.0\Blades End.deps.json
+C:\Users\Spencer Laptop\Desktop\Software Development\Blades End\bin\Debug\net7.0\Blades End.runtimeconfig.json
+C:\Users\Spencer Laptop\Desktop\Software Development\Blades End\bin\Debug\net7.0\Blades End.dll
+C:\Users\Spencer Laptop\Desktop\Software Development\Blades End\bin\Debug\net7.0\Blades End.pdb
+C:\Users\Spencer Laptop\Desktop\Software Development\Blades End\obj\Debug\net7.0\Blades End.csproj.AssemblyReference.cache
+C:\Users\Spencer Laptop\Desktop\Software Development\Blades End\obj\Debug\net7.0\Blades End.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Spencer Laptop\Desktop\Software Development\Blades End\obj\Debug\net7.0\Blades End.AssemblyInfoInputs.cache
+C:\Users\Spencer Laptop\Desktop\Software Development\Blades End\obj\Debug\net7.0\Blades End.AssemblyInfo.cs
+C:\Users\Spencer Laptop\Desktop\Software Development\Blades End\obj\Debug\net7.0\Blades End.csproj.CoreCompileInputs.cache
+C:\Users\Spencer Laptop\Desktop\Software Development\Blades End\obj\Debug\net7.0\Blades End.dll
+C:\Users\Spencer Laptop\Desktop\Software Development\Blades End\obj\Debug\net7.0\refint\Blades End.dll
+C:\Users\Spencer Laptop\Desktop\Software Development\Blades End\obj\Debug\net7.0\Blades End.pdb
+C:\Users\Spencer Laptop\Desktop\Software Development\Blades End\obj\Debug\net7.0\Blades End.genruntimeconfig.cache
+C:\Users\Spencer Laptop\Desktop\Software Development\Blades End\obj\Debug\net7.0\ref\Blades End.dll
