@@ -7,4 +7,9 @@ while(Menu.UseMenu)
     Menu.Key= Console.ReadKey();
     Game.Step = Menu.EvaluateKey(Menu.Key);
 }
-Console.WriteLine(Game.Step);
+Game.EvaluatePlay();
+Console.Clear();
+while(Game.Play)
+{
+    Game.PlayGame();
+}
