@@ -6,11 +6,12 @@ public class Menu
     public bool UseMenu { get; set; }
     public int SelectedOption { get; set; } = 1;
     public ConsoleKeyInfo Key {get; set; }
-    public Menu(string MenuType)
+    public Menu(string MenuType, int PointsToAssign = 0)
     {
         switch(MenuType)
         {
             case "Blank" : LoadBlankMenu(); break;
+            case "YesNo" : LoadYesNoMenu(); break;
             case "ChooseRace" : LoadChooseRaceMenu(); break;
             case "CONFIRMCHOOSEHUMAN" : LoadConfirmChooseHumanMenu(); break;
             case "CONFIRMCHOOSEELF" : LoadConfirmChooseElfMenu(); break;
@@ -20,7 +21,7 @@ public class Menu
             case "CONFIRMCHOOSEHALFORC" : LoadConfirmChooseHalforcMenu(); break;
             case "ChooseClass" : LoadChooseClassMenu(); break;
             case "CONFIRMCHOOSEFIGHTER" : LoadConfirmChooseFighterMenu(); break;
-            case "AssignPoints" : LoadAssignPointsMenu(); break;
+            case "AssignPoints" : LoadAssignPointsMenu(PointsToAssign); break;
             case "MainMenu" : LoadMainMenu(); break;
             default : LoadMainMenu(); break;
         }
@@ -29,6 +30,16 @@ public class Menu
     {
         MenuText = string.Empty;
         UseMenu = false;
+        Key = new ConsoleKeyInfo();
+    }
+    public void LoadYesNoMenu()
+    {
+        MenuText = "Confirm?";
+        MenuOptions.Add("Yes");
+        MenuOptions.Add("No");
+        MenuMethods.Add("YES");
+        MenuMethods.Add("NO");
+        UseMenu = true;
         Key = new ConsoleKeyInfo();
     }
     public void LoadChooseRaceMenu()
@@ -137,9 +148,9 @@ public class Menu
         UseMenu = true;
         Key = new ConsoleKeyInfo();
     }
-    private void LoadAssignPointsMenu()
+    private void LoadAssignPointsMenu(int PointsToAssign)
     {
-        MenuText = "You have 8 attribute points to assign. Move the arrow to the attribute you wish to increase and press enter.";
+        MenuText = $"You have {PointsToAssign} attribute points to assign. Move the arrow to the attribute you wish to increase and press enter.";
         MenuOptions.Add("Strength - ");
         MenuOptions.Add("Dexterity - ");
         MenuOptions.Add("Constitution - ");
@@ -155,7 +166,7 @@ public class Menu
         UseMenu = true;
         Key = new ConsoleKeyInfo();
     }
-    public void ShowMenu(bool assignPoints = false, Player? player = null, int option = 0)
+    public void ShowMenu(bool assignPoints = false, Player? player = null, int option = 0, int points = 8)
     {
         Console.WriteLine(MenuText);
         if(assignPoints)

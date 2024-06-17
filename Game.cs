@@ -37,6 +37,9 @@ public class Game
         Player.AssignRaceBenefits();
         PlayerChooseClass(Player);
         PlayerAssignPoints(Player);
+        Player.ShowStats();
+        Console.ReadKey();
+        Console.Clear();
     }
     private void PlayerChooseName(Player  Player)
     {
@@ -102,13 +105,13 @@ public class Game
     }
     private void PlayerAssignPoints(Player Player)
     {
-        int PointsToAssign = 8;
+        int PointsToAssign = 8; //this needs to be passed into the menutext. It always reads 8.
         Player _player = new Player();
         _player.Race = new Race(Player.Race.Name);
         _player.AssignRaceBenefits();
         _player.Class = new CharacterClass(Player.Class.Name);
         Console.Clear();
-        Menu = new Menu("AssignPoints");
+        Menu = new Menu("AssignPoints", PointsToAssign);
         Menu.ShowMenu(true, _player, 1);
         while(Menu.UseMenu)
         {
@@ -118,38 +121,122 @@ public class Game
             {
                 case "ADDSTRENGTH" : _player.Strength++;
                                     PointsToAssign--;
-                                    Menu = new Menu("AssignPoints");
-                                    Menu.ShowMenu(true, _player, 1);
+                                    if(PointsToAssign == 0)
+                                    {
+                                        ConfirmAssignPoints(_player);
+                                        if(Step == "YES")
+                                        {
+                                            Menu.UseMenu = false;
+                                        }
+                                        if(Step == "NO")
+                                        {
+                                            PointsToAssign = 8;
+                                            _player = new Player();
+                                            _player.Race = new Race(Player.Race.Name);
+                                            _player.AssignRaceBenefits();
+                                            _player.Class = new CharacterClass(Player.Class.Name);
+                                            Console.Clear();
+                                            Menu = new Menu("AssignPoints", PointsToAssign);
+                                            Menu.ShowMenu(true, _player, 1);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Menu = new Menu("AssignPoints", PointsToAssign);
+                                        Menu.ShowMenu(true, _player, 1);
+                                    }
                                     break;
                 case "ADDDEXTERITY" : _player.Dexterity++;
                                       PointsToAssign--;
-                                      Menu = new Menu("AssignPoints");
-                                      Menu.ShowMenu(true, _player, 2);
+                                      if(PointsToAssign == 0)
+                                      {
+                                          ConfirmAssignPoints(_player);
+                                      }
+                                      else
+                                      {
+                                          Menu = new Menu("AssignPoints", PointsToAssign);
+                                          Menu.ShowMenu(true, _player, 2);
+                                      }
                                       break;
                 case "ADDCONSTITUTION" : _player.Constitution++;
                                          PointsToAssign--;
-                                         Menu = new Menu("AssignPoints");
-                                         Menu.ShowMenu(true, _player, 3);
+                                      if(PointsToAssign == 0)
+                                      {
+                                          ConfirmAssignPoints(_player);
+                                      }
+                                      else
+                                      {
+                                          Menu = new Menu("AssignPoints", PointsToAssign);
+                                          Menu.ShowMenu(true, _player, 3);
+                                      }
                                          break;
                 case "ADDINTELLIGENCE" : _player.Intelligence++;
                                          PointsToAssign--;
-                                         Menu = new Menu("AssignPoints");
-                                         Menu.ShowMenu(true, _player, 4);
+                                      if(PointsToAssign == 0)
+                                      {
+                                          ConfirmAssignPoints(_player);
+                                      }
+                                      else
+                                      {
+                                          Menu = new Menu("AssignPoints", PointsToAssign);
+                                          Menu.ShowMenu(true, _player, 4);
+                                      }
                                          break;
                 case "ADDWISDOM" : _player.Wisdom++;
                                    PointsToAssign--;
-                                   Menu = new Menu("AssignPoints");
-                                   Menu.ShowMenu(true, _player, 5);
+                                      if(PointsToAssign == 0)
+                                      {
+                                          ConfirmAssignPoints(_player);
+                                      }
+                                      else
+                                      {
+                                          Menu = new Menu("AssignPoints", PointsToAssign);
+                                          Menu.ShowMenu(true, _player, 5);
+                                      }
                                    break;
                 case "ADDCHARISMA" : _player.Charisma++;
                                      PointsToAssign--;
-                                     Menu = new Menu("AssignPoints");
-                                     Menu.ShowMenu(true, _player, 6);
+                                     if(PointsToAssign == 0)
+                                     {
+                                         ConfirmAssignPoints(_player);
+                                     }
+                                     else
+                                     {
+                                         Menu = new Menu("AssignPoints", PointsToAssign);
+                                         Menu.ShowMenu(true, _player, 6);
+                                     }
                                      break;
             }
-            if(PointsToAssign == 0)
+        }
+    }
+    private void ConfirmAssignPoints(Player _player)
+    {
+        Console.Clear();
+        Menu YesNoMenu = new Menu("YesNo");
+        _player.ShowAttributes();
+        Console.WriteLine("");
+        YesNoMenu.MenuText = "Confirm point distribution?";
+        YesNoMenu.ShowMenu();
+        while(YesNoMenu.UseMenu)
+        {
+            YesNoMenu.Key= Console.ReadKey();
+            Step = YesNoMenu.EvaluateKey(YesNoMenu.Key);
+            if(Step == "YES")
             {
-                //ConfirmAssignPoints();
+                SavePoints(_player);
+                YesNoMenu.UseMenu = false;
+            }
+            else if (Step == "NO")
+            {
+                YesNoMenu.UseMenu = false;
+            }
+            else
+            {
+                Console.Clear();
+                _player.ShowAttributes();
+                Console.WriteLine("");
+                YesNoMenu.MenuText = "Confirm point distribution?";
+                YesNoMenu.ShowMenu();
             }
         }
     }
@@ -193,5 +280,14 @@ public class Game
                 }
             }
         }
+    }
+    private void SavePoints(Player _player)
+    {
+        Player.Strength = _player.Strength;
+        Player.Dexterity = _player.Dexterity;
+        Player.Constitution = _player.Constitution;
+        Player.Intelligence = _player.Intelligence;
+        Player.Wisdom = _player.Wisdom;
+        Player.Charisma = _player.Charisma;
     }
 }
