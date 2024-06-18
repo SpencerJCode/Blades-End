@@ -5,6 +5,7 @@ public class Game
     public string Step { get; set; } = string.Empty;
     public bool Play { get; set; } = false;
     public Menu Menu { get; set; } = new Menu("Blank");
+    public StoryBoard StoryBoard { get; set; } = new StoryBoard("Blank");
     public Player Player { get; set; } = new Player();
     public Game()
     {
@@ -26,8 +27,9 @@ public class Game
         if(!Player.IsValidPlayer())
         {
             CreatePlayer();
+            StoryBoard = new StoryBoard("IntroDialogue");
+            StoryBoard.RunDialogue();
         }
-        Console.Clear();
         Play = false;
     }
     public void CreatePlayer()
