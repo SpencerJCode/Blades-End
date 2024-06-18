@@ -29,6 +29,7 @@ public class Game
             CreatePlayer();
             StoryBoard = new StoryBoard("IntroDialogue");
             StoryBoard.RunDialogue();
+            Player.Journal.ShowJournal();
         }
         Play = false;
     }

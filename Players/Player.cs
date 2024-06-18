@@ -16,6 +16,7 @@ public class Player
     public int Charisma { get; set; } = 10;
     public List<SaveBonus> SaveBonuses { get; set; } = new List<SaveBonus>();
     public CharacterClass Class { get; set; }
+    public Journal Journal { get; set; } = new Journal();
     public Player()
     {
         Race = new Race("Empty");
