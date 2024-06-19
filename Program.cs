@@ -9,7 +9,4 @@ while(Menu.UseMenu)
 }
 Game.EvaluatePlay();
 Console.Clear();
-while(Game.Play)
-{
-    Game.PlayGame();
-}
+Game.PlayGame();

@@ -5,7 +5,7 @@ public class Menu
     public List<string> MenuMethods { get; set; } = new List<string>();
     public bool UseMenu { get; set; }
     public int SelectedOption { get; set; } = 1;
-    public ConsoleKeyInfo Key {get; set; }
+    public ConsoleKeyInfo Key { get; set; }
     public Menu(string MenuType, int PointsToAssign = 0)
     {
         switch(MenuType)
@@ -24,6 +24,13 @@ public class Menu
             case "AssignPoints" : LoadAssignPointsMenu(PointsToAssign); break;
             case "MainMenu" : LoadMainMenu(); break;
             default : LoadMainMenu(); break;
+        }
+    }
+    public Menu(string MenuType, Area CurrentArea, int Gold)
+    {
+        switch(MenuType)
+        {
+            case "Play" : LoadPlayMenu(CurrentArea, Gold); break;
         }
     }
     public void LoadBlankMenu()
@@ -165,6 +172,53 @@ public class Menu
         MenuMethods.Add("ADDCHARISMA");
         UseMenu = true;
         Key = new ConsoleKeyInfo();
+    }
+    private void LoadPlayMenu(Area CurrentArea, int Gold)
+    {
+        MenuText = $"Current Area: {CurrentArea.Name}. ";
+        if(Gold >= CurrentArea.HealPrice)
+        {
+            MenuOptions.Add($"Heal at the {CurrentArea.HealAtArea}");
+            MenuMethods.Add("HEAL");
+        }
+        else
+        {
+            MenuText += $"You need {CurrentArea.HealPrice - Gold} more gold to afford healing. ";
+        }
+        if(Gold >= CurrentArea.SleepPrice)
+        {
+            MenuOptions.Add($"Sleep in {CurrentArea.SleepAtArea}");
+            MenuMethods.Add("SLEEP");
+        }
+        else
+        {
+            MenuText += $"You need {CurrentArea.HealPrice - Gold} more gold to afford to rent a room to sleep. ";
+        }
+        MenuOptions.Add("View Inventory");
+        MenuMethods.Add("INVENTORY");
+        MenuOptions.Add("View Stats");
+        MenuMethods.Add("STATS");
+        MenuOptions.Add("Explore");
+        MenuMethods.Add("EXPLORE");
+        LoadAreaMenu(CurrentArea);
+        MenuOptions.Add("Save Game");
+        MenuMethods.Add("SAVE");
+        MenuOptions.Add("Exit Game");
+        MenuMethods.Add("EXIT");
+        MenuText += "What do you want to do?";
+        UseMenu = true;
+        Key = new ConsoleKeyInfo();
+    }
+    private void LoadAreaMenu(Area CurrentArea)
+    {
+        if(CurrentArea.PlayMenuOptions.Count() > 0)
+        {
+            for(int i=0; i<CurrentArea.PlayMenuOptions.Count(); i++)
+            {
+                MenuOptions.Add(CurrentArea.PlayMenuOptions[i]);
+                MenuMethods.Add(CurrentArea.PlayMenuMethods[i]);
+            }
+        }
     }
     public void ShowMenu(bool assignPoints = false, Player? player = null, int option = 0, int points = 8)
     {

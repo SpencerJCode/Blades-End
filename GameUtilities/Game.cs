@@ -3,23 +3,20 @@ using System.Runtime.CompilerServices;
 public class Game
 {
     public string Step { get; set; } = string.Empty;
-    public bool Play { get; set; } = false;
-    public Menu Menu { get; set; } = new Menu("Blank");
+    public bool ContinuePlay { get; set; } = false;
     public StoryBoard StoryBoard { get; set; } = new StoryBoard("Blank");
     public Player Player { get; set; } = new Player();
-    public Game()
-    {
-
-    }
+    public Area CurrentArea { get; set; } = new Area("Blank");
+    public Menu Menu { get; set; } = new Menu("Blank");
     public void EvaluatePlay()
     {
         if(Step == "NEWGAME" || Step == "CONTINUE")
         {
-            Play = true;
+            ContinuePlay = true;
         }
         else
         {
-            Play = false;
+            ContinuePlay = false;
         }
     }
     public void PlayGame()
@@ -27,11 +24,133 @@ public class Game
         if(!Player.IsValidPlayer())
         {
             CreatePlayer();
+            InitializeGame(true);
+        }
+        else
+        {
+            LoadPlayer(); //Logic doesn't exist to save/load.Here just as a placeholder.
+            InitializeGame(false);
+        }
+        Play(new Menu("Play", CurrentArea, Player.Gold));
+    }
+    public void Play(Menu PlayMenu)
+    {
+        PlayMenu.ShowMenu();
+        while(PlayMenu.UseMenu)
+        {
+            PlayMenu.Key= Console.ReadKey();
+            Step = PlayMenu.EvaluateKey(PlayMenu.Key);
+            if(Step != string.Empty)
+            {
+                if(EvaluateStep())
+                {
+                    PlayMenu = new Menu("Play", CurrentArea, Player.Gold);
+                    PlayMenu.ShowMenu();
+                }
+                else
+                {
+                    PlayMenu.UseMenu = false;
+                }
+            }
+        }
+    }
+    private bool EvaluateStep()
+    {
+        switch(Step)
+        {
+            case "EXIT" : return false;
+            case "SAVE" : SaveGame(); return true;
+            case "STATS" : Player.ShowStats(); return true;
+            case "INVENTORY" : Player.ShowInventory(); return true;
+            case "SLEEP" : Sleep(); return true;
+            case "HEAL" : Heal(); return true;
+            case "EXPLORE" : Explore(); return true;
+            default : Console.WriteLine($"No step method exists for {Step}"); return false;
+        }
+    }
+    private void Explore()
+    {
+
+    }
+    private void Sleep()
+    {
+        Menu SleepMenu = new Menu("YesNo");
+        if(CurrentArea.SleepPrice == 0)
+        {
+            SleepMenu.MenuText = $"Sleep in {CurrentArea.SleepAtArea} for free?";
+        }
+        else
+        {
+            SleepMenu.MenuText = $"Sleep in {CurrentArea.SleepAtArea} for {CurrentArea.SleepPrice} gold?";
+
+        }
+        SleepMenu.ShowMenu();
+        while(SleepMenu.UseMenu)
+        {
+            SleepMenu.Key= Console.ReadKey();
+            Step = SleepMenu.EvaluateKey(SleepMenu.Key);
+            if(Step == "YES")
+            {
+                SleepMenu.UseMenu = false;
+                Player.Gold -= CurrentArea.SleepPrice;
+                SleepHeal();
+            }
+            else if (Step == "NO")
+            {
+                SleepMenu.UseMenu = false;
+            }
+        }
+    }
+    private void SleepHeal()
+    {
+        Console.Clear();
+        Console.WriteLine($"You slept the night in {CurrentArea.SleepAtArea}.");
+        int _ConMod = CalculateMod(Player.Constitution);
+        int HPGainedBySleeping = _ConMod + 1;
+        if((Player.MaxHP - Player.CurrentHP) >= HPGainedBySleeping)
+        {
+            Player.CurrentHP += HPGainedBySleeping;
+            Console.WriteLine($"You gained {HPGainedBySleeping} HP.");
+        }
+        else if (Player.MaxHP != Player.CurrentHP)
+        {
+            HPGainedBySleeping = Player.MaxHP - Player.CurrentHP;
+            Console.WriteLine($"You gained {HPGainedBySleeping} HP.");
+        }
+        else
+        {
+            Console.WriteLine("You are already at full health.");
+        }
+        Console.ReadKey();
+        Console.Clear();
+    }
+    private void Heal()
+    {
+
+    }
+    private void SaveGame()
+    {
+
+    }
+    public void LoadPlayer()
+    {
+
+    }
+    public void InitializeGame(bool IsNewGame)
+    {
+        if(IsNewGame)
+        {
+            CurrentArea = new Area("BladesEndHQ");
             StoryBoard = new StoryBoard("IntroDialogue");
             StoryBoard.RunDialogue();
-            Player.Journal.ShowJournal();
         }
-        Play = false;
+        else
+        {
+            //Below codes will need to be obtained from loading. Putting new game codes in for now.
+            CurrentArea = new Area("BladesEndHQ");
+            StoryBoard = new StoryBoard("IntroDialogue");
+        }
+        Console.Clear();
     }
     public void CreatePlayer()
     {
@@ -292,5 +411,9 @@ public class Game
         Player.Intelligence = _player.Intelligence;
         Player.Wisdom = _player.Wisdom;
         Player.Charisma = _player.Charisma;
+    }
+    public int CalculateMod(int stat)
+    {
+        return (int)Math.Floor(Convert.ToDouble(((stat-10)/2)));
     }
 }

@@ -14,6 +14,7 @@ public class Player
     public int Intelligence { get; set; } = 10;
     public int Wisdom { get; set; } = 10;
     public int Charisma { get; set; } = 10;
+    public int Gold { get; set; } = 10;
     public List<SaveBonus> SaveBonuses { get; set; } = new List<SaveBonus>();
     public CharacterClass Class { get; set; }
     public Journal Journal { get; set; } = new Journal();
@@ -72,5 +73,9 @@ public class Player
         Console.WriteLine("Intelligence: " + Intelligence);
         Console.WriteLine("Wisdom: " + Wisdom);
         Console.WriteLine("Charisma: " + Strength);
+    }
+    public void ShowInventory()
+    {
+
     }
 }

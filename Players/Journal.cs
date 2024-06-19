@@ -15,6 +15,7 @@ public class Journal
                 Console.WriteLine(entry.Entry);
                 Console.WriteLine("---" + entry.Brief);
                 Console.WriteLine("---Reward: " + entry.Reward);
+                Console.WriteLine("");
             }
         }
         Console.ReadKey();
