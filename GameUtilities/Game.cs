@@ -31,7 +31,7 @@ public class Game
             LoadPlayer(); //Logic doesn't exist to save/load.Here just as a placeholder.
             InitializeGame(false);
         }
-        Play(new Menu("Play", CurrentArea, Player.Gold));
+        Play(new Menu("Play", CurrentArea, Player));
     }
     public void Play(Menu PlayMenu)
     {
@@ -44,7 +44,7 @@ public class Game
             {
                 if(EvaluateStep())
                 {
-                    PlayMenu = new Menu("Play", CurrentArea, Player.Gold);
+                    PlayMenu = new Menu("Play", CurrentArea, Player);
                     PlayMenu.ShowMenu();
                 }
                 else
@@ -115,6 +115,7 @@ public class Game
         else if (Player.MaxHP != Player.CurrentHP)
         {
             HPGainedBySleeping = Player.MaxHP - Player.CurrentHP;
+            Player.CurrentHP = Player.MaxHP;
             Console.WriteLine($"You gained {HPGainedBySleeping} HP.");
         }
         else
@@ -398,7 +399,9 @@ public class Game
             {
                 switch(Step)
                 {
-                    case "CHOOSEFIGHTER" : Player.Class = new CharacterClass("Fighter"); break;
+                    case "CHOOSEFIGHTER" : Player.Class = new CharacterClass("Fighter");
+                                           Player.EquipStartingGear();
+                                           break;
                 }
             }
         }

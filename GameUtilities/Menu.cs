@@ -26,11 +26,11 @@ public class Menu
             default : LoadMainMenu(); break;
         }
     }
-    public Menu(string MenuType, Area CurrentArea, int Gold)
+    public Menu(string MenuType, Area CurrentArea, Player Player)
     {
         switch(MenuType)
         {
-            case "Play" : LoadPlayMenu(CurrentArea, Gold); break;
+            case "Play" : LoadPlayMenu(CurrentArea, Player); break;
         }
     }
     public void LoadBlankMenu()
@@ -173,26 +173,31 @@ public class Menu
         UseMenu = true;
         Key = new ConsoleKeyInfo();
     }
-    private void LoadPlayMenu(Area CurrentArea, int Gold)
+    private void LoadPlayMenu(Area CurrentArea, Player player)
     {
         MenuText = $"Current Area: {CurrentArea.Name}. ";
-        if(Gold >= CurrentArea.HealPrice)
+        if(player.Gold >= CurrentArea.HealPrice)
         {
             MenuOptions.Add($"Heal at the {CurrentArea.HealAtArea}");
             MenuMethods.Add("HEAL");
         }
         else
         {
-            MenuText += $"You need {CurrentArea.HealPrice - Gold} more gold to afford healing. ";
+            MenuText += $"You need {CurrentArea.HealPrice - player.Gold} more gold to afford healing. ";
         }
-        if(Gold >= CurrentArea.SleepPrice)
+        if(player.Gold >= CurrentArea.SleepPrice)
         {
             MenuOptions.Add($"Sleep in {CurrentArea.SleepAtArea}");
             MenuMethods.Add("SLEEP");
         }
         else
         {
-            MenuText += $"You need {CurrentArea.HealPrice - Gold} more gold to afford to rent a room to sleep. ";
+            MenuText += $"You need {CurrentArea.HealPrice - player.Gold} more gold to afford to rent a room to sleep. ";
+        }
+        if(player.Inventory.Any(i => i.CanUse == true))
+        {
+            MenuOptions.Add("Use Item");
+            MenuMethods.Add("USEITEM");
         }
         MenuOptions.Add("View Inventory");
         MenuMethods.Add("INVENTORY");

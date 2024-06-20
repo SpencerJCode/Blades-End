@@ -1,15 +1,22 @@
 public class CharacterClass
 {
     public string Name { get; set; }
+    public string StartingArmor { get; set; }
+    public string StartingWeapon { get; set; }
+    public string StartingWeaponType { get; set; }
     public CharacterClass(string _code)
     {
-        if(_code == "Empty")
+        switch(_code)
         {
-            Name = string.Empty;
+            case "Empty" : Name = string.Empty; break;
+            case "Fighter" : LoadFighter(); break;
         }
-        else
-        {
-            Name = _code;
-        }
+    }
+    private void LoadFighter()
+    {
+        Name = "Fighter";
+        StartingArmor = "Scale";
+        StartingWeapon = "Sword";
+        StartingWeaponType = "Long";
     }
 }
