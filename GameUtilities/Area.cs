@@ -13,6 +13,7 @@ public class Area
     public List<string> TravelToAreas { get; set; } = new List<string>();
     public List<string> PlayMenuOptions { get; set; } = new List<string>();
     public List<string> PlayMenuMethods { get; set; } = new List<string>();
+    public List<string> ContainerTypes { get; set; } = new List<string>();
 
     public Area(string _code)
     {
@@ -48,5 +49,40 @@ public class Area
         TravelToAreas.Add("MastanoxStreets");
         PlayMenuOptions.Add("Train your skills");
         PlayMenuMethods.Add("TRAIN");
+        ContainerTypes.Add("Storage Bin");
+        ContainerTypes.Add("Crate");
+    }
+    public List<Item> LoadContainer(int ValueScore)
+    {
+        List<Item> Contents = new List<Item>();
+        Random RandomInt = new Random();
+        int Result = RandomInt.Next(1,21);
+        if(Result == 20)
+        {
+            ValueScore += ValueScore;
+        }
+        Result = RandomInt.Next(1,3);
+        int NumberOfItemsInContainer = 0;
+        while(Result == 1)
+        {
+            NumberOfItemsInContainer++;
+            Result = RandomInt.Next(1,3);
+        }
+        Contents = RandomItems(ValueScore, NumberOfItemsInContainer);
+        return Contents;
+    }
+    public List<Item> RandomItems(int ValueScore, int NumberOfItems)
+    {
+        List<Item> Items = new List<Item>();
+        for(int i=0; i<NumberOfItems; i++)
+        {
+            Items.Add(RandomItem(ValueScore));
+        }
+        return Items;
+    }
+    public Item RandomItem(int ValueScore)
+    {
+        Item Item = new Item("Empty");
+        return Item.NewItem(ValueScore);
     }
 }
