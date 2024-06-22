@@ -14,8 +14,10 @@ public class Player
     public int Intelligence { get; set; } = 10;
     public int Wisdom { get; set; } = 10;
     public int Charisma { get; set; } = 10;
+    public int AvailableSkillPoints  = 0;
+    public List<Skill> Skills = new List<Skill>();
     public List<SaveBonus> SaveBonuses { get; set; } = new List<SaveBonus>();
-    public CharacterClass Class { get; set; }
+    public List<CharacterClass> Classes { get; set; }
     public Journal Journal { get; set; } = new Journal();
     public int Gold { get; set; } = 10;
     public List<Item> Inventory = new List<Item>();
@@ -27,6 +29,7 @@ public class Player
     public Slot Hands = new Slot();
     
     public Slot Head = new Slot();
+    public Slot Amulet = new Slot();
     public Slot Body = new Slot();
     public Slot Waist = new Slot();
     public Slot Feet = new Slot();
@@ -35,7 +38,9 @@ public class Player
     public Player()
     {
         Race = new Race("Empty");
-        Class = new CharacterClass("Empty");
+        Classes = new List<CharacterClass>();
+        Classes[0] = new CharacterClass("Empty");
+        InitializeSkills();
     }
     public void AssignName(string _name)
     {
@@ -66,20 +71,34 @@ public class Player
             }
         }
     }
-    public void ShowStats()
+    public void ShowStats(bool Pause = false)
     {
-        Console.WriteLine(Name);
-        Console.WriteLine("Level " + Level + " " + Race.Name + " " + Class.Name);
+        Console.WriteLine(Name + " the " + Race.Name);
+        foreach(CharacterClass Class in Classes)
+            {
+                Console.WriteLine($"Level {Class.ClassLevel} {Class.Name}");
+            }
         Console.WriteLine("XP: " + CurrentXP + "/" + XPToLevel);
         Console.WriteLine("Health: " + CurrentHP + "/" + MaxHP);
         ShowAttributes(false);
+        Console.WriteLine("");
+        Console.WriteLine("Skills:");
+        ShowSkills();
+        if(Pause)
+        {
+            Console.ReadKey();
+            Console.Clear();
+        }
     }
     public void ShowAttributes(bool ShowMeta = true)
     {
         if(ShowMeta)
         {
-            Console.WriteLine(Name);
-            Console.WriteLine(Race.Name + " " + Class.Name);
+            Console.WriteLine(Name + " the " + Race.Name);
+            foreach(CharacterClass Class in Classes)
+            {
+                Console.WriteLine($"Level {Class.ClassLevel} {Class.Name}");
+            }
         }
         Console.WriteLine("Strength: " + Strength);
         Console.WriteLine("Dexterity: " + Dexterity);
@@ -113,8 +132,54 @@ public class Player
     }
     public void EquipStartingGear()
     {
-        RightHand.Item = new Item(Class.StartingWeapon, Class.StartingWeaponType, "Normal");
-        Body.Item = new Item("Armor", Class.StartingArmor, "Normal");
+        RightHand.Item = new Item(Classes[0].StartingWeapon, Classes[0].StartingWeaponType, "Normal");
+        Body.Item = new Item("Armor", Classes[0].StartingArmor, "Normal");
         Inventory.Add(new Item("Potion", "Healing", "Small"));
+    }
+    public void LoadSkillPoints(int IntelligenceMod, bool Starting, int ClassIndex = 0)
+    {
+        if(Starting)
+        {
+            AvailableSkillPoints += ((IntelligenceMod + Race.Skill + Classes[0].SkillPointsPerLevel) * 4);
+        }
+        else
+        {
+            AvailableSkillPoints += ((IntelligenceMod + Race.Skill + Classes[ClassIndex].SkillPointsPerLevel));
+        }
+    }
+    private void InitializeSkills()
+    {
+        Skills.Add(new Skill("Barter", "Charisma"));
+        Skills.Add(new Skill("Bluff", "Charisma"));
+        Skills.Add(new Skill("Climb", "Strength"));
+        Skills.Add(new Skill("Disarm Traps", "Dexterity"));
+        Skills.Add(new Skill("Hide", "Dexterity"));
+        Skills.Add(new Skill("Jump", "Strength"));
+        Skills.Add(new Skill("Listen", "Wisdom"));
+        Skills.Add(new Skill("Music", "Charisma"));
+        Skills.Add(new Skill("Persuade", "Charisma"));
+        Skills.Add(new Skill("Pick Locks", "Dexterity"));
+        Skills.Add(new Skill("Search", "Intelligence"));
+        Skills.Add(new Skill("Sneak", "Dexterity"));
+        Skills.Add(new Skill("Spot", "Wisdom"));
+        Skills.Add(new Skill("Swim", "Strength"));
+        Skills.Add(new Skill("Tumble", "Dexterity"));
+    }
+    public void UseSkillPoint(int Index)
+    {
+        AvailableSkillPoints--;
+        Skills[Index].Points++;
+    }
+    public void ShowSkills(bool Pause = false)
+    {
+        foreach(Skill skill in Skills)
+        {
+            Console.WriteLine($"{skill.Name} : {skill.Points}");
+        }
+        if(Pause)
+        {
+            Console.ReadKey();
+            Console.Clear();
+        }
     }
 }

@@ -6,9 +6,10 @@ public class Area
     public int Difficulty { get; set; }
     public int Danger { get; set; }
     public string HealAtArea { get; set; }
-    public int HealPrice { get; set; }
+    public int HealPrice { get; set; } //This is multiplied by the amount of missing HP to determine a price. A
+    //HealPrice of 2 and a missing HP amount of 10 results in 20 gold needed to heal.
     public string SleepAtArea { get; set; }
-    public int SleepPrice { get; set; }
+    public int SleepPrice { get; set; } //This is the exact gold amount needed to heal.
     public List<string> Enemies { get; set; } = new List<string>();
     public List<string> TravelToAreas { get; set; } = new List<string>();
     public List<string> PlayMenuOptions { get; set; } = new List<string>();
@@ -43,7 +44,7 @@ public class Area
         Difficulty = 1;
         Danger = 1;
         HealAtArea  = "Clinic";
-        HealPrice = 6;
+        HealPrice = 2;
         SleepAtArea = "your quarters";
         SleepPrice = 0;
         TravelToAreas.Add("MastanoxStreets");

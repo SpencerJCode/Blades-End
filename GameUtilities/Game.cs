@@ -4,6 +4,7 @@ public class Game
 {
     public string Step { get; set; } = string.Empty;
     public bool ContinuePlay { get; set; } = false;
+    public Clock Clock { get; set; } = new Clock();
     public StoryBoard StoryBoard { get; set; } = new StoryBoard("Blank");
     public Player Player { get; set; } = new Player();
     public Area CurrentArea { get; set; } = new Area("Blank");
@@ -60,7 +61,7 @@ public class Game
         {
             case "EXIT" : return false;
             case "SAVE" : SaveGame(); return true;
-            case "STATS" : Player.ShowStats(); return true;
+            case "STATS" : Player.ShowStats(true); return true;
             case "INVENTORY" : Player.ShowInventory(); return true;
             case "SLEEP" : Sleep(); return true;
             case "HEAL" : Heal(); return true;
@@ -82,7 +83,6 @@ public class Game
         else
         {
             SleepMenu.MenuText = $"Sleep in {CurrentArea.SleepAtArea} for {CurrentArea.SleepPrice} gold?";
-
         }
         SleepMenu.ShowMenu();
         while(SleepMenu.UseMenu)
@@ -124,10 +124,44 @@ public class Game
         }
         Console.ReadKey();
         Console.Clear();
+        Clock.AdvanceClock(1);
+        Clock.ShowClock(true);
     }
     private void Heal()
     {
+        Menu HealMenu = new Menu("YesNo");
+        if(CurrentArea.HealPrice == 0)
+        {
+            HealMenu.MenuText = $"Heal in {CurrentArea.HealAtArea} for free?";
+        }
+        else
+        {
+            HealMenu.MenuText = $"Heal in {CurrentArea.HealAtArea} for {CurrentArea.HealPrice * (Player.MaxHP - Player.CurrentHP)} gold?";
 
+        }
+        HealMenu.ShowMenu();
+        while(HealMenu.UseMenu)
+        {
+            HealMenu.Key= Console.ReadKey();
+            Step = HealMenu.EvaluateKey(HealMenu.Key);
+            if(Step == "YES")
+            {
+                HealMenu.UseMenu = false;
+                BuyHeal(CurrentArea.HealPrice * (Player.MaxHP - Player.CurrentHP));
+            }
+            else if (Step == "NO")
+            {
+                HealMenu.UseMenu = false;
+            }
+        }
+    }
+    private void BuyHeal(int HealPrice)
+    {
+        Console.WriteLine($"Healed at the {CurrentArea.HealAtArea} for {HealPrice} gold. ");
+        Player.Gold -= CurrentArea.HealPrice * (Player.MaxHP - Player.CurrentHP);
+        Player.CurrentHP = Player.MaxHP;
+        Console.ReadKey();
+        Console.Clear();
     }
     private void SaveGame()
     {
@@ -160,6 +194,8 @@ public class Game
         Player.AssignRaceBenefits();
         PlayerChooseClass(Player);
         PlayerAssignPoints(Player);
+        Player.LoadSkillPoints(CalculateMod(Player.Intelligence), true);
+        PlayerChooseSkills(Player);
         Player.ShowStats();
         Console.ReadKey();
         Console.Clear();
@@ -217,7 +253,7 @@ public class Game
             if(Step != string.Empty)
             {
                 ConfirmClass();
-                if(Player.Class.Name == string.Empty)
+                if(Player.Classes[0].Name == string.Empty)
                 {
                     Console.Clear();
                     Menu = new Menu("ChooseClass");
@@ -232,10 +268,10 @@ public class Game
         Player _player = new Player();
         _player.Race = new Race(Player.Race.Name);
         _player.AssignRaceBenefits();
-        _player.Class = new CharacterClass(Player.Class.Name);
+        _player.Classes[0] = new CharacterClass(Player.Classes[0].Name);
         Console.Clear();
         Menu = new Menu("AssignPoints", PointsToAssign);
-        Menu.ShowMenu(true, _player, 1);
+        Menu.ShowMenu(true, false, _player, 1);
         while(Menu.UseMenu)
         {
             Menu.Key= Console.ReadKey();
@@ -257,16 +293,16 @@ public class Game
                                             _player = new Player();
                                             _player.Race = new Race(Player.Race.Name);
                                             _player.AssignRaceBenefits();
-                                            _player.Class = new CharacterClass(Player.Class.Name);
+                                            _player.Classes[0] = new CharacterClass(Player.Classes[0].Name);
                                             Console.Clear();
                                             Menu = new Menu("AssignPoints", PointsToAssign);
-                                            Menu.ShowMenu(true, _player, 1);
+                                            Menu.ShowMenu(true, false, _player, 1);
                                         }
                                     }
                                     else
                                     {
                                         Menu = new Menu("AssignPoints", PointsToAssign);
-                                        Menu.ShowMenu(true, _player, 1);
+                                        Menu.ShowMenu(true, false, _player, 1);
                                     }
                                     break;
                 case "ADDDEXTERITY" : _player.Dexterity++;
@@ -278,7 +314,7 @@ public class Game
                                       else
                                       {
                                           Menu = new Menu("AssignPoints", PointsToAssign);
-                                          Menu.ShowMenu(true, _player, 2);
+                                          Menu.ShowMenu(true, false, _player, 2);
                                       }
                                       break;
                 case "ADDCONSTITUTION" : _player.Constitution++;
@@ -290,7 +326,7 @@ public class Game
                                       else
                                       {
                                           Menu = new Menu("AssignPoints", PointsToAssign);
-                                          Menu.ShowMenu(true, _player, 3);
+                                          Menu.ShowMenu(true, false, _player, 3);
                                       }
                                          break;
                 case "ADDINTELLIGENCE" : _player.Intelligence++;
@@ -302,7 +338,7 @@ public class Game
                                       else
                                       {
                                           Menu = new Menu("AssignPoints", PointsToAssign);
-                                          Menu.ShowMenu(true, _player, 4);
+                                          Menu.ShowMenu(true, false, _player, 4);
                                       }
                                          break;
                 case "ADDWISDOM" : _player.Wisdom++;
@@ -314,7 +350,7 @@ public class Game
                                       else
                                       {
                                           Menu = new Menu("AssignPoints", PointsToAssign);
-                                          Menu.ShowMenu(true, _player, 5);
+                                          Menu.ShowMenu(true, false, _player, 5);
                                       }
                                    break;
                 case "ADDCHARISMA" : _player.Charisma++;
@@ -326,9 +362,77 @@ public class Game
                                      else
                                      {
                                          Menu = new Menu("AssignPoints", PointsToAssign);
-                                         Menu.ShowMenu(true, _player, 6);
+                                         Menu.ShowMenu(true, false, _player, 6);
                                      }
                                      break;
+            }
+        }
+    }
+    private void PlayerChooseSkills(Player Player)
+    {
+        Console.Clear();
+        int StartingPoints = Player.AvailableSkillPoints;
+        Menu = new Menu("AssignSkills", CurrentArea, Player);
+        Menu.ShowMenu(false, true, Player, 1);
+        while(Menu.UseMenu)
+        {
+            Menu.Key= Console.ReadKey();
+            Step = Menu.EvaluateKey(Menu.Key);
+            if(Step != string.Empty)
+            {
+                 if(Player.Skills[Convert.ToInt32(Step)].Points != 4)
+                {
+                    Player.UseSkillPoint(Convert.ToInt32(Step));
+                }
+                if(Player.AvailableSkillPoints == 0)
+                {
+                    ConfirmAssignSkills(Player);
+                    if(Step == "YES")
+                    {
+                        Menu.UseMenu = false;
+                    }
+                    else
+                    {
+                        Player.AvailableSkillPoints = StartingPoints;
+                        foreach(Skill skill in Player.Skills)
+                        {
+                            skill.Points=0;
+                        }
+                        Menu = new Menu("AssignSkills", CurrentArea, Player);
+                        Menu.ShowMenu(false, true, Player, 1);
+                    }
+                }
+                else
+                {
+                    Menu = new Menu("AssignSkills", CurrentArea, Player);
+                    Menu.ShowMenu(false, true, Player, Convert.ToInt32(Step)+1);
+                }
+            }
+        }
+    }
+    private void ConfirmAssignSkills(Player _player)
+    {
+        Console.Clear();
+        Menu YesNoMenu = new Menu("YesNo");
+        _player.ShowSkills();
+        Console.WriteLine("");
+        YesNoMenu.MenuText = "Confirm point distribution?";
+        YesNoMenu.ShowMenu();
+        while(YesNoMenu.UseMenu)
+        {
+            YesNoMenu.Key= Console.ReadKey();
+            Step = YesNoMenu.EvaluateKey(YesNoMenu.Key);
+            if(Step == "YES" || Step == "NO")
+            {
+                YesNoMenu.UseMenu = false;
+            }
+            else
+            {
+                Console.Clear();
+                _player.ShowSkills();
+                Console.WriteLine("");
+                YesNoMenu.MenuText = "Confirm point distribution?";
+                YesNoMenu.ShowMenu();
             }
         }
     }
@@ -399,7 +503,7 @@ public class Game
             {
                 switch(Step)
                 {
-                    case "CHOOSEFIGHTER" : Player.Class = new CharacterClass("Fighter");
+                    case "CHOOSEFIGHTER" : Player.Classes[0] = new CharacterClass("Fighter");
                                            Player.EquipStartingGear();
                                            break;
                 }

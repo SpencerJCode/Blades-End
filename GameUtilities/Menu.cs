@@ -30,6 +30,7 @@ public class Menu
     {
         switch(MenuType)
         {
+            case "AssignSkills" : LoadAssignSkillsMenu(Player); break;
             case "Play" : LoadPlayMenu(CurrentArea, Player); break;
         }
     }
@@ -173,26 +174,45 @@ public class Menu
         UseMenu = true;
         Key = new ConsoleKeyInfo();
     }
+    private void LoadAssignSkillsMenu(Player player)
+    {
+        int Index = 0;
+        MenuText = $"You have {player.AvailableSkillPoints} points to assign. Skills cannot be raised above 4 at this time.";
+        foreach(Skill skill in player.Skills)
+        {
+            MenuOptions.Add($"{skill.Name}: {skill.Points}");
+            MenuMethods.Add($"{Index}");
+            Index++;
+        }
+        UseMenu = true;
+        Key = new ConsoleKeyInfo();
+    }
     private void LoadPlayMenu(Area CurrentArea, Player player)
     {
         MenuText = $"Current Area: {CurrentArea.Name}. ";
-        if(player.Gold >= CurrentArea.HealPrice)
+        if(CurrentArea.HealAtArea != string.Empty && player.CurrentHP != player.MaxHP)
         {
-            MenuOptions.Add($"Heal at the {CurrentArea.HealAtArea}");
-            MenuMethods.Add("HEAL");
+            if(player.Gold >= (CurrentArea.HealPrice * ( player.MaxHP - player.CurrentHP)))
+            {
+                MenuOptions.Add($"Heal at the {CurrentArea.HealAtArea}");
+                MenuMethods.Add("HEAL");
+            }
+            else
+            {
+                MenuText += $"You need {CurrentArea.HealPrice * ( player.MaxHP - player.CurrentHP)} more gold to afford healing at the {CurrentArea.HealAtArea}. ";
+            }
         }
-        else
+        if(CurrentArea.SleepAtArea  != string.Empty)
         {
-            MenuText += $"You need {CurrentArea.HealPrice - player.Gold} more gold to afford healing. ";
-        }
-        if(player.Gold >= CurrentArea.SleepPrice)
-        {
-            MenuOptions.Add($"Sleep in {CurrentArea.SleepAtArea}");
-            MenuMethods.Add("SLEEP");
-        }
-        else
-        {
-            MenuText += $"You need {CurrentArea.HealPrice - player.Gold} more gold to afford to rent a room to sleep. ";
+            if(player.Gold >= CurrentArea.SleepPrice)
+            {
+                MenuOptions.Add($"Sleep in {CurrentArea.SleepAtArea}");
+                MenuMethods.Add("SLEEP");
+            }
+            else
+            {
+                MenuText += $"You need {CurrentArea.HealPrice - player.Gold} more gold to afford to rent a room to sleep in {CurrentArea.SleepAtArea}. ";
+            }
         }
         if(player.Inventory.Any(i => i.CanUse == true))
         {
@@ -206,8 +226,6 @@ public class Menu
         MenuOptions.Add("Explore");
         MenuMethods.Add("EXPLORE");
         LoadAreaMenu(CurrentArea);
-        MenuOptions.Add("Save Game");
-        MenuMethods.Add("SAVE");
         MenuOptions.Add("Exit Game");
         MenuMethods.Add("EXIT");
         MenuText += "What do you want to do?";
@@ -225,7 +243,7 @@ public class Menu
             }
         }
     }
-    public void ShowMenu(bool assignPoints = false, Player? player = null, int option = 0, int points = 8)
+    public void ShowMenu(bool assignPoints = false, bool assignSkills = false, Player? player = null, int option = 0, int points = 8)
     {
         Console.WriteLine(MenuText);
         if(assignPoints)
@@ -236,6 +254,10 @@ public class Menu
             MenuOptions[3] += player?.Intelligence;
             MenuOptions[4] += player?.Wisdom;
             MenuOptions[5] += player?.Charisma;
+            SelectedOption = option;
+        }
+        if(assignSkills)
+        {
             SelectedOption = option;
         }
         for(int i = 1; i <= MenuOptions.Count(); i++)
