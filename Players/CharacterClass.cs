@@ -1,3 +1,5 @@
+using System.Net.Mail;
+
 public class CharacterClass
 {
     public string Name { get; set; }
@@ -5,6 +7,10 @@ public class CharacterClass
     public int SkillPointsPerLevel { get; set; } = 0;
     public int HPDiceType { get; set; }
     public List<int> Attacks { get; set; }
+    public int FortitudeSave { get; set; } = 0;
+    public int ReflexSave { get; set; } = 0;
+    public int WillSave { get; set; } = 0;
+
     public string StartingArmor { get; set; }
     public string StartingWeapon { get; set; }
     public string StartingWeaponType { get; set; }
@@ -27,6 +33,8 @@ public class CharacterClass
         StartingWeaponType = "Long";
         LoadStrongAttacks();
         LoadStrongAttack(1);
+        int WeakSave = (int)Math.Floor(Convert.ToDouble(ClassLevel/3)); //Lowest save is a third of the class level rounded down.
+        LoadMightSaves(WeakSave);
     }
     private void LoadStrongAttack(int Level)
     {
@@ -35,22 +43,41 @@ public class CharacterClass
     private void LoadStrongAttacks()
     {
         List<int> attack = new List<int>();
+        attack.Add(0);
         for(int i=1; i<21; i++)
         {
             attack[0]=i;
             StrongAttacks.Add(attack);
         }
-        for(int i=6; i<21; i++)
+        for(int i=5; i<20; i++)
         {
-            StrongAttacks[i-1][1] = i-5;
+            StrongAttacks[i].Add(i-4);
         }
-        for(int i=11; i<21; i++)
+        for(int i=10; i<20; i++)
         {
-            StrongAttacks[i-1][2] = i-10;
+            StrongAttacks[i].Add(i-9);
         }
-        for(int i=16; i<21; i++)
+        for(int i=15; i<20; i++)
         {
-            StrongAttacks[i-1][3] = i-15;
+            StrongAttacks[i].Add(i-14);
         }
+    }
+    private void LoadMightSaves(int WeakSave)
+    {
+        FortitudeSave = WeakSave * 2;
+        ReflexSave = WeakSave;
+        WillSave  = WeakSave;
+    }
+    private void LoadNimbleSaves(int WeakSave)
+    {
+        FortitudeSave = WeakSave;
+        ReflexSave = WeakSave * 2;
+        WillSave  = WeakSave;
+    }
+    private void LoadSeerSaves(int WeakSave)
+    {
+        FortitudeSave = WeakSave;
+        ReflexSave = WeakSave;
+        WillSave  = WeakSave * 2;
     }
 }

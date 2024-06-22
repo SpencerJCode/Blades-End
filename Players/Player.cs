@@ -1,3 +1,5 @@
+using System.Reflection.Metadata.Ecma335;
+
 public class Player
 {
     public string Name { get; set; } = string.Empty;
@@ -39,7 +41,7 @@ public class Player
     {
         Race = new Race("Empty");
         Classes = new List<CharacterClass>();
-        Classes[0] = new CharacterClass("Empty");
+        Classes.Add(new CharacterClass("Empty"));
         InitializeSkills();
     }
     public void AssignName(string _name)
@@ -80,7 +82,14 @@ public class Player
             }
         Console.WriteLine("XP: " + CurrentXP + "/" + XPToLevel);
         Console.WriteLine("Health: " + CurrentHP + "/" + MaxHP);
+        Console.WriteLine("");
+        Console.WriteLine("ATTRIBUTES");
         ShowAttributes(false);
+        Console.WriteLine("");
+        Console.WriteLine("SAVES:");
+        Console.WriteLine($"Fortitude Save: {CalculateSave("Fortitude")}");
+        Console.WriteLine($"Reflex Save: {CalculateSave("Reflex")}");
+        Console.WriteLine($"Will Save: {CalculateSave("Will")}");
         Console.WriteLine("");
         Console.WriteLine("Skills:");
         ShowSkills();
@@ -181,5 +190,76 @@ public class Player
             Console.ReadKey();
             Console.Clear();
         }
+    }
+    public int CalculateSave(string _code)
+    {
+        switch(_code)
+        {
+            case "Fortitude" :  return CalculateFortitudeSave();
+            case "Reflex" :  return CalculateReflexSave();
+            case "Will" :  return CalculateWillSave();
+            default : return 0;
+        }
+    }
+    private int CalculateFortitudeSave(string effect = "")
+    {
+        int total = CalculateMod(Constitution);
+        if(SaveBonuses.Any(sb => sb.Effect == effect))
+        {
+            foreach(SaveBonus savebonus in SaveBonuses)
+            {
+                if(savebonus.Effect == effect)
+                {
+                    total += savebonus.Modifier;
+                }
+            }
+        }
+        for(int i=0; i<Classes.Count(); i++)
+        {
+            total+=Classes[i].FortitudeSave;
+        }
+        return total;
+    }
+    private int CalculateReflexSave(string effect = "")
+    {
+        int total = CalculateMod(Dexterity);
+        if(SaveBonuses.Any(sb => sb.Effect == effect))
+        {
+            foreach(SaveBonus savebonus in SaveBonuses)
+            {
+                if(savebonus.Effect == effect)
+                {
+                    total += savebonus.Modifier;
+                }
+            }
+        }
+        for(int i=0; i<Classes.Count(); i++)
+        {
+            total+=Classes[i].ReflexSave;
+        }
+        return total;
+    }
+    private int CalculateWillSave(string effect = "")
+    {
+        int total = CalculateMod(Wisdom);
+        if(SaveBonuses.Any(sb => sb.Effect == effect))
+        {
+            foreach(SaveBonus savebonus in SaveBonuses)
+            {
+                if(savebonus.Effect == effect)
+                {
+                    total += savebonus.Modifier;
+                }
+            }
+        }
+        for(int i=0; i<Classes.Count(); i++)
+        {
+            total+=Classes[i].WillSave;
+        }
+        return total;
+    }
+    private int CalculateMod(int stat)
+    {
+        return (int)Math.Floor(Convert.ToDouble(((stat-10)/2)));
     }
 }
