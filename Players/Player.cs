@@ -3,7 +3,6 @@ using System.Reflection.Metadata.Ecma335;
 public class Player
 {
     public string Name { get; set; } = string.Empty;
-    public int Level { get; set; } = 1;
     public int CurrentXP { get; set; } = 0;
     public int XPToLevel { get; set; } = 1000;
     public int CurrentHP { get; set; } = 10;
@@ -17,6 +16,7 @@ public class Player
     public int Wisdom { get; set; } = 10;
     public int Charisma { get; set; } = 10;
     public int AvailableSkillPoints  = 0;
+    public int AvailableAttributePoints = 0;
     public List<Skill> Skills = new List<Skill>();
     public List<SaveBonus> SaveBonuses { get; set; } = new List<SaveBonus>();
     public List<CharacterClass> Classes { get; set; }
@@ -261,5 +261,19 @@ public class Player
     private int CalculateMod(int stat)
     {
         return (int)Math.Floor(Convert.ToDouble(((stat-10)/2)));
+    }
+    public void LevelUp(CharacterClass Class, Dice Dice)
+    {
+        MaxHP += Dice.Roll(1, Class.HPDiceType, CalculateMod(Constitution));
+        Class.LevelUp();
+        int TotalLevel = Classes.Sum(c => c.ClassLevel);
+        CurrentXP = CurrentXP - XPToLevel;
+        XPToLevel+= (TotalLevel*1000);
+        AvailableSkillPoints+=Class.SkillPointsPerLevel;
+        AvailableSkillPoints+=CalculateMod(Intelligence);
+        if(TotalLevel % 4 == 0)
+        {
+            AvailableAttributePoints++;
+        }
     }
 }

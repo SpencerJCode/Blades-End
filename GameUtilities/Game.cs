@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 
 public class Game
 {
+    Random Random = new Random();
     public string Step { get; set; } = string.Empty;
     public bool ContinuePlay { get; set; } = false;
     public Clock Clock { get; set; } = new Clock();
@@ -9,6 +10,7 @@ public class Game
     public Player Player { get; set; } = new Player();
     public Area CurrentArea { get; set; } = new Area("Blank");
     public Menu Menu { get; set; } = new Menu("Blank");
+    public Dice Dice = new Dice();
     public void EvaluatePlay()
     {
         if(Step == "NEWGAME" || Step == "CONTINUE")
@@ -65,13 +67,39 @@ public class Game
             case "INVENTORY" : Player.ShowInventory(); return true;
             case "SLEEP" : Sleep(); return true;
             case "HEAL" : Heal(); return true;
+            case "TRAIN" : Train(); return true;
             case "EXPLORE" : Explore(); return true;
             default : Console.WriteLine($"No step method exists for {Step}"); return false;
+        }
+    }
+    private void Train()
+    {
+        Menu TrainMenu = new Menu("Train", CurrentArea, Player);
+        TrainMenu.ShowMenu();
+        while(TrainMenu.UseMenu)
+        {
+            TrainMenu.Key= Console.ReadKey();
+            Step = TrainMenu.EvaluateKey(TrainMenu.Key);
+            if(Step != string.Empty)
+            {
+                switch(Step)
+                {
+                    case "PRACTICECOMBAT" : PracticeCombat(); break;
+                }
+                TrainMenu.UseMenu = false;
+            }
         }
     }
     private void Explore()
     {
 
+    }
+    private void PracticeCombat()
+    {
+        Dummy Dummy = new Dummy(CurrentArea.Difficulty);
+        List<Enemy> Enemies = new List<Enemy>();
+        Enemies.Add(Dummy);
+        Fight(Enemies);
     }
     private void Sleep()
     {
@@ -227,7 +255,7 @@ public class Game
         Menu.ShowMenu();
         while(Menu.UseMenu)
         {
-            Menu.Key= Console.ReadKey();
+            Menu.Key = Console.ReadKey();
             Step = Menu.EvaluateKey(Menu.Key);
             if(Step != string.Empty)
             {
@@ -371,6 +399,7 @@ public class Game
     private void PlayerChooseSkills(Player Player)
     {
         Console.Clear();
+        int skillMax = Player.Classes.Sum(c=>c.ClassLevel)+3;
         int StartingPoints = Player.AvailableSkillPoints;
         Menu = new Menu("AssignSkills", CurrentArea, Player);
         Menu.ShowMenu(false, true, Player, 1);
@@ -380,7 +409,7 @@ public class Game
             Step = Menu.EvaluateKey(Menu.Key);
             if(Step != string.Empty)
             {
-                 if(Player.Skills[Convert.ToInt32(Step)].Points != 4)
+                 if(Player.Skills[Convert.ToInt32(Step)].Points != skillMax)
                 {
                     Player.UseSkillPoint(Convert.ToInt32(Step));
                 }
@@ -522,5 +551,61 @@ public class Game
     public int CalculateMod(int stat)
     {
         return (int)Math.Floor(Convert.ToDouble(((stat-10)/2)));
+    }
+    private void Fight(List<Enemy> Enemies)
+    {
+        List<string> FightOrder = Initiative(Enemies);
+        while(Enemies.Any(e=>e.CurrentHP >0) && Player.CurrentHP > 0)
+        {
+            for(int i=0; i<FightOrder.Count(); i++)
+            {
+                if(FightOrder[i] == "Player")
+                {
+                    Menu FightMenu = new Menu("Fight", CurrentArea, Player, Enemies);
+                    FightMenu.ShowMenu();
+                    while(FightMenu.UseMenu)
+                    {
+                        FightMenu.Key = Console.ReadKey();
+                        Step = FightMenu.EvaluateKey(FightMenu.Key);
+                    }
+                }
+                else if(!Enemies[Convert.ToInt32(FightOrder[i])].IsDisabled)
+                {
+                    //Enemy Attack Player
+                }
+            }
+            
+        }
+    }
+    private List<string> Initiative(List<Enemy> Enemies)
+    {
+        List<string> FightOrder = new List<string>();
+        int PlayerInititative = Dice.d20() + CalculateMod(Player.Dexterity);
+        List<string> BeforePlayer = new List<string>();
+        List<string> AfterPlayer = new List<string>();
+        int index = 0;
+        foreach(Enemy enemy in Enemies)
+        {
+            if(Dice.d20() + CalculateMod(enemy.Dexterity) > PlayerInititative)
+            {
+                BeforePlayer.Add($"{index}");
+            }
+            else
+            {
+                AfterPlayer.Add($"{index}");
+            }
+            index++;
+        }
+        foreach(string enemy in BeforePlayer)
+        {
+            FightOrder.Add(enemy);
+        }
+        FightOrder.Add("Player");
+        foreach(string enemy in AfterPlayer)
+        {
+            FightOrder.Add(enemy);
+        }
+        return FightOrder; //this doesn't ACTUALLY determine the correct fight order. Enemies aren't organize by
+        //initiative roll, only whether or not they are before the player. Logid tbd.
     }
 }

@@ -23,6 +23,14 @@ public class CharacterClass
             case "Fighter" : LoadFighter(); break;
         }
     }
+    public void LevelUp()
+    {
+        ClassLevel++;
+        switch(Name)
+        {
+            case "Fighter" : FighterLevelUp(); break;
+        }
+    }
     private void LoadFighter()
     {
         Name = "Fighter";
@@ -36,7 +44,18 @@ public class CharacterClass
         int WeakSave = (int)Math.Floor(Convert.ToDouble(ClassLevel/3)); //Lowest save is a third of the class level rounded down.
         LoadMightSaves(WeakSave);
     }
-    private void LoadStrongAttack(int Level)
+    private void FighterLevelUp()
+    {
+        ClassLevel++;
+        LoadStrongAttack(ClassLevel);
+        int WeakSave = (int)Math.Floor(Convert.ToDouble(ClassLevel/3));
+        LoadMightSaves(WeakSave);
+        if(ClassLevel%2 == 0)
+        {
+            //LoadFighterFeat();
+        }
+    }
+    public void LoadStrongAttack(int Level)
     {
         Attacks = StrongAttacks[Level-1];
     }

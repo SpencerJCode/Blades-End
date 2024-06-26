@@ -26,18 +26,71 @@ public class Menu
             default : LoadMainMenu(); break;
         }
     }
-    public Menu(string MenuType, Area CurrentArea, Player Player)
+    public Menu(string MenuType, Area CurrentArea, Player Player, List<Enemy>? Enemies = null)
     {
         switch(MenuType)
         {
             case "AssignSkills" : LoadAssignSkillsMenu(Player); break;
             case "Play" : LoadPlayMenu(CurrentArea, Player); break;
+            case "Train" : LoadTrainMenu(CurrentArea, Player); break;
+            case "Fight" : LoadFightMenu(CurrentArea, Player, Enemies); break;
+        }
+    }
+    private void LoadFightMenu(Area CurrentArea, Player Player, List<Enemy> Enemies)
+    {
+        MenuText = "Fighting a ";
+        if(Enemies.Count() == 1)
+        {
+            MenuText += $"{Enemies[0].Name}!";
+        }
+        else
+        {
+            for(int i=0; i<Enemies.Count(); i++)
+            {
+                if(i != Enemies.Count()-1)
+                {
+                    MenuText += $"{Enemies[i].Name}, ";
+                }
+                else
+                {
+                    MenuText += $"and a {Enemies[i].Name}!";
+                }
+            }
+        }
+        int index = 0;
+        foreach(Enemy enemy in Enemies)
+        {
+            MenuOptions.Add($"Attack {enemy.Name}!");
+            MenuMethods.Add($"{index}");
         }
     }
     public void LoadBlankMenu()
     {
         MenuText = string.Empty;
         UseMenu = false;
+        Key = new ConsoleKeyInfo();
+    }
+    private void LoadTrainMenu(Area CurrentArea, Player Player)
+    {
+        MenuText = "How do you want to train?";
+        if(Player.AvailableSkillPoints != 0)
+        {
+            MenuOptions.Add("Develop your skills");
+            MenuMethods.Add("TRAINSKILLS");
+        }
+        if(Player.AvailableAttributePoints != 0)
+        {
+            MenuOptions.Add("Train your body");
+            MenuMethods.Add("TRAINATTRIBUTES");
+        }
+        if(Player.CurrentXP > Player.XPToLevel)
+        {
+            MenuOptions.Add("Advance your class");
+            MenuMethods.Add("LEVELUP");
+        }
+        MenuOptions.Add("Practice combat");
+        MenuMethods.Add("PRACTICECOMBAT");
+        UseMenu = true;
         Key = new ConsoleKeyInfo();
     }
     public void LoadYesNoMenu()
@@ -177,7 +230,7 @@ public class Menu
     private void LoadAssignSkillsMenu(Player player)
     {
         int Index = 0;
-        MenuText = $"You have {player.AvailableSkillPoints} points to assign. Skills cannot be raised above 4 at this time.";
+        MenuText = $"You have {player.AvailableSkillPoints} points to assign. Max skill level is your current total level plus 3.";
         foreach(Skill skill in player.Skills)
         {
             MenuOptions.Add($"{skill.Name}: {skill.Points}");

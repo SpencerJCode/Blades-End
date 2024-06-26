@@ -40,7 +40,7 @@ public class Area
     {
         Name = "Blade's End Headquarters";
         Code = _code;
-        Type = "CITY";
+        Type = "Urban";
         Difficulty = 1;
         Danger = 1;
         HealAtArea  = "Clinic";
