@@ -14,7 +14,7 @@ public abstract class Enemy
     public int AvailableAttributePoints = 0;
     public List<Skill> Skills = new List<Skill>();
     public List<SaveBonus> SaveBonuses { get; set; } = new List<SaveBonus>();
-    public List<CharacterClass> Classes { get; set; }
+    public List<CharacterClass> Classes { get; set; } = new List<CharacterClass>();
     public int Gold { get; set; } = 10;
     public List<Item> Inventory = new List<Item>();
     public Slot LeftHand = new Slot();
@@ -30,5 +30,11 @@ public abstract class Enemy
     public Slot Waist = new Slot();
     public Slot Feet = new Slot();
     public Slot Back = new Slot();
-
+    public void ShowStats()
+    {
+        Console.Clear();
+        Console.WriteLine(Name);
+        Console.WriteLine(CurrentHP);
+        Console.WriteLine(IsDisabled);
+    }
 }

@@ -294,6 +294,7 @@ public class Game
     {
         int PointsToAssign = 8; //this needs to be passed into the menutext. It always reads 8.
         Player _player = new Player();
+        _player.Name = Player.Name;
         _player.Race = new Race(Player.Race.Name);
         _player.AssignRaceBenefits();
         _player.Classes[0] = new CharacterClass(Player.Classes[0].Name);
@@ -557,8 +558,13 @@ public class Game
         List<string> FightOrder = Initiative(Enemies);
         while(Enemies.Any(e=>e.CurrentHP >0) && Player.CurrentHP > 0)
         {
-            for(int i=0; i<FightOrder.Count(); i++)
+            for(int i=0; i<=FightOrder.Count(); i++)
             {
+                Console.ReadKey();
+                if(i == FightOrder.Count())
+                {
+                    i=0;
+                }
                 if(FightOrder[i] == "Player")
                 {
                     Menu FightMenu = new Menu("Fight", CurrentArea, Player, Enemies);
@@ -567,12 +573,28 @@ public class Game
                     {
                         FightMenu.Key = Console.ReadKey();
                         Step = FightMenu.EvaluateKey(FightMenu.Key);
+                        if(Step != string.Empty)
+                        {
+                            Console.Clear();
+                            Console.WriteLine($"{Player.Name} attacks {Enemies[Convert.ToInt32(Step)].Name}!");
+                        }
                     }
                 }
-                else if(!Enemies[Convert.ToInt32(FightOrder[i])].IsDisabled)
+                else if(Enemies[Convert.ToInt32(FightOrder[i])].IsDisabled)
                 {
-                    //Enemy Attack Player
+                    Console.Clear();
+                    Console.WriteLine($"{Enemies[Convert.ToInt32(FightOrder[i])].Name} is disabled and cannot attack!");
+                    Console.ReadKey();
+                    Console.Clear();
                 }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine($"{Enemies[Convert.ToInt32(FightOrder[i])].Name} attacks!");
+                    Console.ReadKey();
+                    Console.Clear();
+                }
+
             }
             
         }
